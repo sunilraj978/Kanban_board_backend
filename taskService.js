@@ -96,7 +96,8 @@ async function updateTask(id, title, description, version) {
 
 }
 
-async function moveTask(id, column, prevPos, nextPos) {
+
+async function moveTask(id, column, position) {
 
   const conn = await db.getConnection();
 
@@ -104,19 +105,11 @@ async function moveTask(id, column, prevPos, nextPos) {
 
     await conn.beginTransaction();
 
-    console.log(prevPos, nextPos);
-    let newPosition;
-
-    if (!prevPos && !nextPos) newPosition = 1;
-    else if (!prevPos) newPosition = nextPos / 2;
-    else if (!nextPos) newPosition = prevPos + 1;
-    else newPosition = (prevPos + nextPos) / 2;
-
     await conn.query(
       `UPDATE tasks
        SET column_type=?, position=?, version=version+1, updated_at=NOW()
        WHERE id=?`,
-      [column, newPosition, id]
+      [column, position, id]
     );
 
     await conn.commit();
@@ -133,6 +126,7 @@ async function moveTask(id, column, prevPos, nextPos) {
   }
 
 }
+
 
 async function deleteTask(id) {
 
